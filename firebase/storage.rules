@@ -1,0 +1,24 @@
+
+// See https://firebase.google.com/docs/storage/security/start
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Only allow authenticated users to read/write their own files.
+    // The path here should match how you structure your files.
+    // For example, if you store alert photos under /alerts/{farmId}/{userId}/{photoId}
+    
+    // This rule allows public read for any file in the /alerts/ path,
+    // which is useful for easily displaying images on the frontend.
+    match /alerts/{allPaths=**} {
+      allow read;
+      // Write access should be restricted to your backend (Cloud Functions).
+      allow write: if false;
+    }
+    
+    // Lock down everything else by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

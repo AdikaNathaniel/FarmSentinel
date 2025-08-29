@@ -1,0 +1,39 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Allow users to read and write to their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    // Allow users to manage their own pest logs
+    match /farms/{farmId}/pest-log/{logId} {
+      allow read, create: if request.auth != null;
+    }
+
+    // Rules for nodes - allows any authenticated user to manage nodes for now.
+    // In a production app, you'd want to tie this to farm ownership.
+    match /farms/{farmId}/nodes/{nodeId} {
+       allow read, create, update, delete: if request.auth != null;
+    }
+
+    // Alerts and logs can be read by any authenticated user.
+    // Creation is handled by backend functions/APIs, so client creation is disallowed.
+    match /farms/{farmId}/alerts/{alertId} {
+      allow read: if request.auth != null;
+      allow create: if false; 
+    }
+     match /farms/{farmId}/logs/{logId} {
+      allow read: if request.auth != null;
+      allow create: if false;
+    }
+
+    // Fallback rule: deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
