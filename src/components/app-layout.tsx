@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect } from 'react';
@@ -33,6 +32,7 @@ const navItems = [
   { href: '/pest-management', icon: Bug, label: 'Pest Management' },
   { href: '/assistant', icon: MessageSquare, label: 'Assistant' },
   { href: '/logs', icon: FileText, label: 'Logs' },
+  { href: '/profile', icon: User, label: 'Profile' }, // ✅ Added Profile route
 ];
 
 const mobileNavItems = [
@@ -41,6 +41,7 @@ const mobileNavItems = [
   { href: '/nodes', icon: Share2, label: 'Nodes' },
   { href: '/alerts', icon: ShieldAlert, label: 'Alerts' },
   { href: '/assistant', icon: MessageSquare, label: 'Assistant' },
+  { href: '/profile', icon: User, label: 'Profile' }, // ✅ Added Profile to mobile nav
 ];
 
 const settingsItem = { href: '/settings', icon: Settings, label: 'Settings' };
@@ -258,30 +259,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return; 
 
-    // If user is not logged in and is trying to access a private page,
-    // redirect them to the home/landing page.
     if (!user && !isPublicPage) {
       router.replace('/');
     }
   }, [user, loading, isPublicPage, router, pathname]);
 
-
   if (isPublicPage) {
     return <>{children}</>;
   }
 
-  // If we are trying to access a private page but are still loading auth state,
-  // show a full-page loader.
   if (loading) {
-     return (
+    return (
       <div className="flex min-h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
 
-  // If there is no user and we are on a private page (this might happen briefly
-  // before the redirect effect kicks in), show a loader as well.
   if (!user) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-background">
@@ -290,17 +284,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If user is authenticated, show the main app layout for private pages.
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
       <SidebarInset>
         <div className="flex min-h-screen flex-col">
-            <AppHeader />
-            <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
-                {children}
-            </main>
-            <BottomNavBar />
+          <AppHeader />
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
+            {children}
+          </main>
+          <BottomNavBar />
         </div>
       </SidebarInset>
     </SidebarProvider>
